@@ -162,12 +162,12 @@ We periodically audit community-run gallery repositories to ensure each project 
 - A README is present with up-to-date boilerplate instructions and the correct logo.
 - The logo assets are checked into the repository under a `assets/` (or similar) directory and are referenced from the README.
 
-| Showcase | Repository slug | Canonical domain |
-| --- | --- | --- |
-| Goldshore | `goldshore/showcase` | https://huggingface.co/spaces/goldshore |
-| GearSwipe | `gearswipe/showcase` | https://huggingface.co/spaces/gearswipe |
-| Armsway | `armsway/showcase` | https://huggingface.co/spaces/armsway |
-| RMarston | `rmarston/showcase` | https://huggingface.co/spaces/rmarston |
+| Showcase | Repository slug | Official domain | Hugging Face Space |
+| --- | --- | --- | --- |
+| Goldshore | `goldshore/showcase` | https://goldshore.ai | https://huggingface.co/spaces/goldshore |
+| GearSwipe | `gearswipe/showcase` | https://gearswipe.app | https://huggingface.co/spaces/gearswipe |
+| Armsway | `armsway/showcase` | https://armsway.ai | https://huggingface.co/spaces/armsway |
+| RMarston | `rmarston/showcase` | https://rmarston.io | https://huggingface.co/spaces/rmarston |
 
 Update the table above whenever a showcase domain changes so downstream boilerplate stays consistent across READMEs and logos.
 
