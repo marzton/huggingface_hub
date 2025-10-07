@@ -17,7 +17,6 @@
 import atexit
 import inspect
 import os
-from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional
 
 from .utils import experimental, is_fastapi_available, is_gradio_available
