@@ -1,3 +1,4 @@
+import asyncio
 import unittest
 from unittest.mock import patch
 
@@ -110,28 +111,28 @@ WEBHOOK_PAYLOAD_WITH_UPDATED_REFS = {
 }
 
 
-def test_deserialize_payload_example_with_comment() -> None:
-    """Confirm that the test stub can actually be deserialized."""
-    payload = WebhookPayload.model_validate(WEBHOOK_PAYLOAD_CREATE_DISCUSSION)
-    assert payload.event.scope == WEBHOOK_PAYLOAD_CREATE_DISCUSSION["event"]["scope"]
-    assert payload.comment is not None
-    assert payload.comment.content == "Add co2 emissions information to the model card"
+@requires("gradio")
+class TestWebhookPayload(unittest.TestCase):
+    def test_deserialize_payload_example_with_comment(self) -> None:
+        """Confirm that the test stub can actually be deserialized."""
+        payload = WebhookPayload.model_validate(WEBHOOK_PAYLOAD_CREATE_DISCUSSION)
+        assert payload.event.scope == WEBHOOK_PAYLOAD_CREATE_DISCUSSION["event"]["scope"]
+        assert payload.comment is not None
+        assert payload.comment.content == "Add co2 emissions information to the model card"
 
+    def test_deserialize_payload_example_without_comment(self) -> None:
+        """Confirm that the test stub can actually be deserialized."""
+        payload = WebhookPayload.model_validate(WEBHOOK_PAYLOAD_UPDATE_DISCUSSION)
+        assert payload.event.scope == WEBHOOK_PAYLOAD_UPDATE_DISCUSSION["event"]["scope"]
+        assert payload.comment is None
 
-def test_deserialize_payload_example_without_comment() -> None:
-    """Confirm that the test stub can actually be deserialized."""
-    payload = WebhookPayload.model_validate(WEBHOOK_PAYLOAD_UPDATE_DISCUSSION)
-    assert payload.event.scope == WEBHOOK_PAYLOAD_UPDATE_DISCUSSION["event"]["scope"]
-    assert payload.comment is None
-
-
-def test_deserialize_payload_example_with_updated_refs() -> None:
-    """Confirm that the test stub can actually be deserialized."""
-    payload = WebhookPayload.model_validate(WEBHOOK_PAYLOAD_WITH_UPDATED_REFS)
-    assert payload.updatedRefs is not None
-    assert payload.updatedRefs[0].ref == "refs/pr/5"
-    assert payload.updatedRefs[0].oldSha is None
-    assert payload.updatedRefs[0].newSha == "227c78346870a85e5de4fff8a585db68df975406"
+    def test_deserialize_payload_example_with_updated_refs(self) -> None:
+        """Confirm that the test stub can actually be deserialized."""
+        payload = WebhookPayload.model_validate(WEBHOOK_PAYLOAD_WITH_UPDATED_REFS)
+        assert payload.updatedRefs is not None
+        assert payload.updatedRefs[0].ref == "refs/pr/5"
+        assert payload.updatedRefs[0].oldSha is None
+        assert payload.updatedRefs[0].newSha == "227c78346870a85e5de4fff8a585db68df975406"
 
 
 @requires("gradio")
@@ -147,16 +148,26 @@ class TestWebhooksServerDontRun(unittest.TestCase):
         self.assertIn("/webhooks/handler", app.registered_webhooks)
         self.assertIs(handler, app.registered_webhooks["/webhooks/handler"])
 
+    def test_add_webhook_decorator_returns_callable(self):
+        app = WebhooksServer()
+
+        @app.add_webhook
+        async def handler():
+            return "ok"
+
+        self.assertEqual(asyncio.run(handler()), "ok")
+
     def test_add_webhook_explicit_path(self):
         # Test adding a webhook
         app = WebhooksServer()
 
         @app.add_webhook(path="/test_webhook")
         async def handler():
-            pass
+            return "registered"
 
         self.assertIn("/webhooks/test_webhook", app.registered_webhooks)  # still registered under /webhooks
         self.assertIs(handler, app.registered_webhooks["/webhooks/test_webhook"])
+        self.assertEqual(asyncio.run(handler()), "registered")
 
     def test_add_webhook_direct_call_returns_original_callable(self):
         app = WebhooksServer()
